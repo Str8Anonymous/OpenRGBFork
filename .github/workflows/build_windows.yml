@@ -34,7 +34,8 @@ jobs:
     - name: Copy Dependencies
       shell: cmd
       run: |
-        windeployqt release/OpenRGB.exe --dir release
+        windeployqt release/OpenRGB.exe --dir release --no-translations
+        exit /b 0
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
