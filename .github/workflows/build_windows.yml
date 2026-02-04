@@ -30,18 +30,22 @@ jobs:
     - name: Build OpenRGB
       shell: cmd
       run: |
-        echo "Listing Qt directory to find MinGW:"
-        dir /s /b D:\a\OpenRGB\qt\Qt\Tools\
+        echo "Finding MinGW directory..."
+        cd /d D:\a\OpenRGB\qt\Qt\Tools
+        for /d %%D in (mingw*) do set "MINGW_ROOT=D:\a\OpenRGB\qt\Qt\Tools\%%D"
+        
+        echo Found MinGW at: %MINGW_ROOT%
         
         set "QT_DIR=D:\a\OpenRGB\qt\Qt\6.5.0\mingw_64"
-        set "MINGW_BIN=D:\a\OpenRGB\qt\Qt\Tools\mingw1120_64\bin"
+        set "MINGW_BIN=%MINGW_ROOT%\bin"
         set PATH=%QT_DIR%\bin;%MINGW_BIN%;%PATH%
         
-        echo "Checking for g++..."
-        where g++
-        echo "Checking for qmake..."
-        where qmake
+        echo Checking versions...
+        g++ --version
+        qmake -v
         
+        echo Building...
+        cd /d D:\a\OpenRGB\OpenRGB
         qmake OpenRGB.pro -spec win32-g++
         mingw32-make -j2
 
