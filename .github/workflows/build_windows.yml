@@ -28,32 +28,39 @@ jobs:
       uses: lukka/get-cmake@latest
 
     - name: Build OpenRGB
-      shell: cmd
+      shell: powershell
       run: |
-        echo "Finding MinGW directory..."
-        cd /d D:\a\OpenRGB\qt\Qt\Tools
-        for /d %%D in (mingw*) do set "MINGW_ROOT=D:\a\OpenRGB\qt\Qt\Tools\%%D"
+        # 1. Find MinGW Directory
+        $qtTools = "D:\a\OpenRGB\qt\Qt\Tools"
+        $mingwDir = Get-ChildItem -Path $qtTools -Directory -Filter "mingw*" | Select-Object -First 1
         
-        echo Found MinGW at: %MINGW_ROOT%
+        if (-not $mingwDir) {
+            Write-Error "Could not find MinGW directory in $qtTools"
+            exit 1
+        }
         
-        set "QT_DIR=D:\a\OpenRGB\qt\Qt\6.5.0\mingw_64"
-        set "MINGW_BIN=%MINGW_ROOT%\bin"
-        set PATH=%QT_DIR%\bin;%MINGW_BIN%;%PATH%
+        $mingwBin = "$($mingwDir.FullName)\bin"
+        Write-Host "Found MinGW at: $mingwBin"
         
-        echo Checking versions...
+        # 2. Set Paths
+        $qtBin = "D:\a\OpenRGB\qt\Qt\6.5.0\mingw_64\bin"
+        $env:PATH = "$qtBin;$mingwBin;$env:PATH"
+        
+        # 3. Check Tools
+        Write-Host "Checking versions:"
         g++ --version
         qmake -v
         
-        echo Building...
-        cd /d D:\a\OpenRGB\OpenRGB
+        # 4. Build
+        Write-Host "Starting Build..."
         qmake OpenRGB.pro -spec win32-g++
         mingw32-make -j2
 
     - name: Copy Dependencies
-      shell: cmd
+      shell: powershell
       run: |
-        set "QT_DIR=D:\a\OpenRGB\qt\Qt\6.5.0\mingw_64"
-        set PATH=%QT_DIR%\bin;%PATH%
+        $qtBin = "D:\a\OpenRGB\qt\Qt\6.5.0\mingw_64\bin"
+        $env:PATH = "$qtBin;$env:PATH"
         windeployqt release/OpenRGB.exe --dir release
 
     - name: Upload Artifact
