@@ -30,7 +30,7 @@ jobs:
     - name: Build OpenRGB
       shell: cmd
       run: |
-        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        set PATH=D:\a\OpenRGB\qt\Qt\Tools\mingw1120_64\bin;%PATH%
         qmake OpenRGB.pro -spec win32-g++
         mingw32-make -j2
 
