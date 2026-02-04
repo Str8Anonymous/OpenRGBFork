@@ -38,6 +38,7 @@
 #define CORSAIR_COMMANDER_CORE4_PID                 0x0C3C
 #define CORSAIR_COMMANDER_CORE5_PID                 0x0C3D
 #define CORSAIR_COMMANDER_CORE6_PID                 0x0C3E
+#define CORSAIR_COMMANDER_CORE7_PID                 0x0C56
 #define CORSAIR_COMMANDER_CORE_XT_PID               0x0C2A
 
 enum
