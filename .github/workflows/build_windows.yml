@@ -21,25 +21,15 @@ jobs:
       with:
         version: '6.5.0'
         host: 'windows'
-        arch: 'win64_mingw'
-        dir: 'D:/a/OpenRGB/qt/'
-        # Explicitly request the tools to be safe
-        tools: 'tools_mingw,qt.tools.win64_mingw'
+        arch: 'win64_msvc2019_64'
         set-env: 'true'
-
-    - name: Get latest CMake and Ninja
-      uses: lukka/get-cmake@latest
 
     - name: Build OpenRGB
       shell: cmd
       run: |
-        echo "Checking PATH..."
-        where qmake
-        where g++
-        
-        echo "Building..."
-        qmake OpenRGB.pro -spec win32-g++
-        mingw32-make -j2
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        qmake OpenRGB.pro CONFIG+=release
+        nmake
 
     - name: Copy Dependencies
       shell: cmd
