@@ -325,7 +325,6 @@ TRANSLATIONS +=                                                                 
 #-----------------------------------------------------------------------------------------------#
 # Windows-specific Configuration                                                                #
 #-----------------------------------------------------------------------------------------------#
-win32:QMAKE_CXXFLAGS += /utf-8
 win32:INCLUDEPATH +=                                                                            \
     dependencies/display-library/include                                                        \
     dependencies/hidapi-win/include                                                             \
@@ -373,6 +372,13 @@ win32:contains(QMAKE_TARGET.arch, x86_64) {
     LIBS +=                                                                                     \
         -lws2_32                                                                                \
         -liphlpapi                                                                              \
+        -lole32                                                                                 \
+        -loleaut32                                                                              \
+        -lwbemuuid                                                                              \
+        -lsetupapi                                                                              \
+        -luser32                                                                                \
+        -lgdi32                                                                                 \
+        -ladvapi32                                                                              \
         -L"$$PWD/dependencies/libusb-1.0.27/VS2019/MS64/dll" -llibusb-1.0                       \
         -L"$$PWD/dependencies/hidapi-win/x64/" -lhidapi                                         \
         -L"$$PWD/dependencies/mbedtls-3.2.1/lib/x64/" -lmbedcrypto -lmbedtls -lmbedx509         \

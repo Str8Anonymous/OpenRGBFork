@@ -101,17 +101,29 @@ std::chrono::system_clock::time_point parseUTCTimestamp(const std::string& times
     {
         tz = strdup(tz);
     }
+#if defined(_WIN32)
+    _putenv_s("TZ", "");
+#else
     setenv("TZ", "", 1);
+#endif
     tzset();
     std::time_t ctime = std::mktime(&tm);
     if (tz)
     {
+#if defined(_WIN32)
+        _putenv_s("TZ", tz);
+#else
         setenv("TZ", tz, 1);
+#endif
         free(tz);
     }
     else
     {
+#if defined(_WIN32)
+        _putenv("TZ=");
+#else
         unsetenv("TZ");
+#endif
     }
     tzset();
 #endif
