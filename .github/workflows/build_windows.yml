@@ -30,37 +30,48 @@ jobs:
     - name: Build OpenRGB
       shell: powershell
       run: |
-        # 1. Find MinGW Directory
-        $qtTools = "D:\a\OpenRGB\qt\Qt\Tools"
-        $mingwDir = Get-ChildItem -Path $qtTools -Directory -Filter "mingw*" | Select-Object -First 1
+        $rootDir = "D:\a\OpenRGB\qt"
         
-        if (-not $mingwDir) {
-            Write-Error "Could not find MinGW directory in $qtTools"
+        Write-Host "Searching for toolchains in $rootDir..."
+        
+        # Find g++.exe
+        $gpp = Get-ChildItem -Path $rootDir -Recurse -Filter "g++.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if (-not $gpp) {
+            Write-Error "Could not find g++.exe"
             exit 1
         }
+        $mingwBin = $gpp.Directory.FullName
+        Write-Host "Found MinGW bin: $mingwBin"
         
-        $mingwBin = "$($mingwDir.FullName)\bin"
-        Write-Host "Found MinGW at: $mingwBin"
+        # Find qmake.exe
+        $qmake = Get-ChildItem -Path $rootDir -Recurse -Filter "qmake.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if (-not $qmake) {
+            Write-Error "Could not find qmake.exe"
+            exit 1
+        }
+        $qtBin = $qmake.Directory.FullName
+        Write-Host "Found Qt bin: $qtBin"
         
-        # 2. Set Paths
-        $qtBin = "D:\a\OpenRGB\qt\Qt\6.5.0\mingw_64\bin"
+        # Set Path
         $env:PATH = "$qtBin;$mingwBin;$env:PATH"
         
-        # 3. Check Tools
-        Write-Host "Checking versions:"
+        # Verify
         g++ --version
         qmake -v
         
-        # 4. Build
-        Write-Host "Starting Build..."
+        # Build
         qmake OpenRGB.pro -spec win32-g++
         mingw32-make -j2
 
     - name: Copy Dependencies
       shell: powershell
       run: |
-        $qtBin = "D:\a\OpenRGB\qt\Qt\6.5.0\mingw_64\bin"
+        # Re-find paths (env vars don't persist between steps automatically in simple run blocks)
+        $rootDir = "D:\a\OpenRGB\qt"
+        $qmake = Get-ChildItem -Path $rootDir -Recurse -Filter "qmake.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+        $qtBin = $qmake.Directory.FullName
         $env:PATH = "$qtBin;$env:PATH"
+        
         windeployqt release/OpenRGB.exe --dir release
 
     - name: Upload Artifact
