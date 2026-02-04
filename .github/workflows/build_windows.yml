@@ -30,13 +30,26 @@ jobs:
     - name: Build OpenRGB
       shell: cmd
       run: |
-        set PATH=D:\a\OpenRGB\qt\Qt\Tools\mingw1120_64\bin;%PATH%
+        echo "Listing Qt directory to find MinGW:"
+        dir /s /b D:\a\OpenRGB\qt\Qt\Tools\
+        
+        set "QT_DIR=D:\a\OpenRGB\qt\Qt\6.5.0\mingw_64"
+        set "MINGW_BIN=D:\a\OpenRGB\qt\Qt\Tools\mingw1120_64\bin"
+        set PATH=%QT_DIR%\bin;%MINGW_BIN%;%PATH%
+        
+        echo "Checking for g++..."
+        where g++
+        echo "Checking for qmake..."
+        where qmake
+        
         qmake OpenRGB.pro -spec win32-g++
         mingw32-make -j2
 
     - name: Copy Dependencies
       shell: cmd
       run: |
+        set "QT_DIR=D:\a\OpenRGB\qt\Qt\6.5.0\mingw_64"
+        set PATH=%QT_DIR%\bin;%PATH%
         windeployqt release/OpenRGB.exe --dir release
 
     - name: Upload Artifact
